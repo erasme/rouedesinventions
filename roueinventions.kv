@@ -1,0 +1,151 @@
+#:kivy 1.7.1
+#:set rouemargin 5
+
+<Label>:
+	font_name: 'data/kycw1_49.ttf'
+
+<Roue>:
+	circle_radius: min(self.width, self.height) * 0.6
+	item_radius: min(self.width, self.height) * 0.4
+	circle_outer_radius: self.circle_radius
+
+	canvas.before:
+		Color:
+			rgb: 0.86, 0.87, 0.86
+		Rectangle:
+			size: self.size
+
+		Color:
+			rgb: 0.9476, 0.6235, 0.6784, 1
+		Ellipse:
+			pos: self.center_x - self.circle_outer_radius / 2, self.center_y - self.circle_outer_radius / 2
+			size: self.circle_outer_radius, self.circle_outer_radius
+			segments: 6
+			angle_start: self.angle
+			angle_end: self.angle + 360
+
+		Color:
+			rgb: self.circle_color
+		Ellipse:
+			pos: self.center_x - self.circle_radius / 2, self.center_y - self.circle_radius / 2
+			size: self.circle_radius, self.circle_radius
+			segments: 6
+			angle_start: self.angle
+			angle_end: self.angle + 360
+
+
+<RoueItem>:
+	size_hint: None, None
+	item_size: self.item_radius
+	size: self.item_size, self.item_size
+	font_size: self.item_radius / 13.
+	do_scale: False
+
+	canvas.before:
+		StencilPush
+		Ellipse:
+			size: self.size
+			segments: 40
+		StencilUse
+		Color:
+			rgb: 1, 1, 1
+		Ellipse:
+			size: self.size
+			segments: 40
+	canvas.after:
+		StencilPop
+
+	BoxLayout:
+		id: topcontent
+		pos: (root.width - self.width) / 2., root.height - dp(rouemargin) - self.height
+		size: root.item_radius - dp(rouemargin * 2), root.item_radius - dp(rouemargin * 2)
+		orientation: 'vertical'
+		canvas:
+			Color:
+				rgba: 0, 1, 0, 0
+			Rectangle:
+				pos: self.pos
+				size: self.size
+
+		Image:
+			source: 'data/sd/{}.png'.format(root.item_id) if root.item_id else None
+			size_hint_y: .6
+
+		Widget:
+			size_hint: .3, None
+			height: '2dp'
+			pos_hint: {'center_x': .5}
+
+			canvas:
+				Color:
+					rgb: .28, .75, .92
+				Rectangle:
+					pos: self.pos
+					size: self.size
+
+		Label:
+			text: root.item_title.upper().replace('|', '\n')
+			color: (.94, .22, .31, 1)
+			mipmap: True
+			valign: 'middle'
+			halign: 'center'
+			font_size: root.font_size
+			size_hint_y: .4
+
+	GridLayout:
+		cols: 1
+		pos: (root.width - self.width) / 2., topcontent.y - self.height
+		size: root.item_radius * root.item_scale_open - dp(20), self.minimum_height
+		opacity: root.desc_opacity
+		orientation: 'vertical'
+
+		Widget:
+			size_hint_y: None
+			height: '3dp'
+
+			canvas:
+				Color:
+					rgba: .94, .22, .31, .5
+				Rectangle:
+					pos: self.x + self.width / 4, self.top
+					size: self.width / 2., dp(1)
+
+		Label:
+			text: u'Date de creation: {}'.format(root.item_date)
+			color: (.94, .22, .31, 1)
+			font_size: root.font_size
+			size_hint_y: None
+			height: self.texture_size[1]
+
+		Label:
+			text: root.item_description
+			color: (0, .713, .862, 1)
+			font_size: root.font_size
+			text_size: self.width, None
+			halign: 'center'
+			size_hint_y: None
+			height: self.texture_size[1]
+
+<Invention>:
+	canvas.before:
+		StencilPush
+		Ellipse:
+			pos: self.center_x - self.radius / 2, self.center_y - self.radius / 2
+			size: self.radius, self.radius
+			segments: 30
+		StencilUse
+		Color:
+			rgba: 0.9476, 0.6235, 0.6784, .85
+		Rectangle:
+			pos: self.pos
+			size: self.size
+
+	canvas.after:
+		StencilPop
+
+	Label:
+		text: 'Bravo\nVous avez trouvé\nl\'invention du\n[b]CINEMATOGRAPHE[/b]'
+		markup: True
+		size: root.size
+		halign: 'center'
+		font_size: min(self.height, self.width) / 25.
