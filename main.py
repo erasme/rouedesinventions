@@ -17,12 +17,14 @@ from kivy.vector import Vector
 from kivy.uix.floatlayout import FloatLayout
 from kivy.animation import Animation
 from math import cos, sin, pi, degrees
+from itertools import chain
 
 
 class Invention(FloatLayout):
 
     roue = ObjectProperty()
     radius = NumericProperty(1)
+    invention_title = StringProperty()
 
     def on_touch_down(self, touch):
         super(Invention, self).on_touch_down(touch)
@@ -108,22 +110,58 @@ class RoueItem(Scatter):
 class Roue(FloatLayout):
 
     circle_radius = NumericProperty()
-    item_radius = NumericProperty()
+    item_radius = NumericProperty(100)
     circle_color = ListProperty([1, 1, 1, 1])
     circle_outer_hidden = BooleanProperty(True)
     circle_outer_radius = NumericProperty(10)
     children_ordered = ListProperty([])
+    items_count = NumericProperty(0)
     timer = NumericProperty()
     found = BooleanProperty(False)
     angle = NumericProperty()
 
     def __init__(self, **kwargs):
+        self.bind(size=self._update_item_radius,
+                items_count=self._update_item_radius)
         super(Roue, self).__init__(**kwargs)
         Clock.schedule_interval(self.update, 1 / 60.)
 
-    def load_inventions(self, inventions):
-        for item in inventions.get('items', []):
+    def _update_item_radius(self, *args):
+        if self.items_count == 0:
+            return
+        m = min(map(float, self.size))
+        p = m * pi
+        r = p / self.items_count
+
+        p -= r * 4
+        r = p / self.items_count
+        self.item_radius = r * 2 - pi
+        self.circle_radius = m - r * 3
+
+
+    def load_inventions(self, data):
+        items = data.get('items', [])
+        self.items_count = len(items)
+        for item in items:
             self.create_item(**item)
+
+        ids = [x.get('id') for x in items]
+
+        inventions = data.get('inventions', [])
+
+        self.inventions = {}
+        self.items_to_inventions = {}
+
+        for invention in inventions:
+            self.inventions[invention.get('id')] = invention
+            for item in invention.get('items', []):
+                if item not in self.items_to_inventions:
+                    self.items_to_inventions[item] = []
+                self.items_to_inventions[item].append(invention.get('id'))
+                if item not in ids:
+                    print 'WARNING: Invention {} missing {}'.format(
+                        invention.get('id'), item)
+
 
     def create_item(self, id, title, description, date):
         item = RoueItem(item_id=id, item_title=title,
@@ -185,28 +223,67 @@ class Roue(FloatLayout):
 
     def check_inventions(self, dt):
         items = [item for item in self.children if item.is_cooking]
-        color_hot = [0.9411, 0.2274, 0.3137, 1]
-        color_cold = [.28, .75, .92, 1]
 
-        answers_needed = 3
-        diff = [(1 - x) / answers_needed for x in color_hot]
+        # search if some item inventions match
+        count_inventions = {}
+        cold = hot = 0
+        for item in items:
+            if item.item_id not in self.items_to_inventions:
+                cold += 1
+                continue
+            for invention_id in self.items_to_inventions.get(item.item_id, []):
+                if invention_id not in count_inventions:
+                    count_inventions[invention_id] = 1
+                else:
+                    count_inventions[invention_id] += 1
 
-        count = len(items)
+        if count_inventions:
+            hot += max(count_inventions.values())
+
+        hot_percent = 0
+        hot_item_needed = 0
+        hot_invention = None
+        for invention_id, count in count_inventions.items():
+            invention = self.inventions[invention_id]
+            item_needed = len(invention.get('items'))
+            percent = count / float(item_needed)
+            hot_percent = max(percent, hot_percent)
+            if hot_percent == percent:
+                hot_item_needed = item_needed
+                hot_invention = invention_id
+
+        if hot_item_needed != len(items) and hot_percent:
+            hot_percent -= 0.1
+
+        cold_percent = cold / 3.
+        value = hot_percent - cold_percent
+
+        #print (hot, cold), (hot_percent, cold_percent), value, count_inventions
+        color_hot = [1 - x for x in [0.9411, 0.2274, 0.3137, 1]]
+        color_cold = [1 - x for x in [.28, .75, .92, 1]]
+
+        if value > 0: 
+            dest_color = [1 - x * value for x in color_hot]
+        else:
+            value = -value
+            dest_color = [1 - x * value for x in color_cold]
+
         d = 3 * dt
-        dest_color = [1 - diff[x] * count for x in range(4)]
         self.circle_color = [self.circle_color[x] - (self.circle_color[x] - dest_color[x]) * d for x in range(4)]
 
-        if count == answers_needed:
+        if hot_percent == 1:
             if self.circle_outer_hidden:
-                self.show_outer_circle()
+                self.show_outer_circle(hot_invention)
                 self.circle_outer_hidden = False
         else:
             if not self.circle_outer_hidden:
                 self.hide_outer_circle()
                 self.circle_outer_hidden = True
 
-    def show_outer_circle(self):
-        self._invention = Invention(roue=self, size=self.size)
+    def show_outer_circle(self, invention_id):
+        invention = self.inventions[invention_id]
+        self._invention = Invention(roue=self, size=self.size,
+                invention_title=invention.get('title'))
         self.add_widget(self._invention)
         self.found = True
         anim = Animation(
@@ -233,6 +310,7 @@ class Roue(FloatLayout):
                 child.is_cooking = False
 
 class RoueInventionsApp(App):
+    icon = 'data/icon.png'
     def build(self):
         with open('data/inventions.json') as fd:
             inventions = json.load(fd)

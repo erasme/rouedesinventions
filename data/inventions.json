@@ -4,7 +4,7 @@
 			"id": "aiguille-chat",
 			"title": "Aiguille à chas|dans la pointe",
 			"date": "1755",
-			"description": "Permet de passer le fil au travers du tissu sans que l’aiguille ne traverse complètement. Cette innovation permet de mécaniser la couture en simplifiant le geste au maximum"
+			"description": "Permet de passer le fil au travers du tissu sans que l’aiguille ne traverse complètement. Cette innovation permet de mécaniser la couture en simplifiant le geste au maximum."
 		},
 		{
 			"id": "amplificateur",
@@ -19,10 +19,40 @@
 			"description": "Une des propriétés de l’électricité est de pouvoir circuler dans des fils conducteurs (cuivre)"
 		},
 		{
+			"id": "chainette",
+			"title": "Point de|chainette",
+			"date": "1830",
+			"description": "Premier point de couture mécanique"
+		},
+		{
+			"id": "chambre-noire",
+			"title": "Principe de la|chambre obscure",
+			"date": "Antiquité",
+			"description": "Phénomène naturel grâce auquel dans une pièce totalement obscure, si la lumière filtre par une petite ouverture, une image inversée apparaît sur le mur opposé à l’ouverture. Cette image est l’exacte copie du paysage extérieur."
+		},
+		{
+			"id": "code-morse",
+			"title": "Code Morse",
+			"date": "1838",
+			"description": "Le code Morse, permet de transcrire des messages. Un signal court forme un point et un signal long forme un trait."
+		},
+		{
 			"id": "courroie",
 			"title": "Courroie entrainée|par une pédale",
 			"date": "1849",
 			"description": "C’est une force mécanique qui permet le fonctionnement de l’objet"
+		},
+		{
+			"id": "electroaimant",
+			"title": "Electroaimant",
+			"date": "1820",
+			"description": "Magnétisation du métal par l’électricité : le courant électrique lorsqu’il circule dans un morceau de métal, magnétise ce dernier."
+		},
+		{
+			"id": "engrenage",
+			"title": "Engrenage",
+			"date": "Antiquité",
+			"description": "Ensemble de roues dentées se transmettant un mouvement."
 		},
 		{
 			"id": "equilibre-roue",
@@ -31,10 +61,70 @@
 			"description": "Grâce à la vitesse, l’équilibre sur deux roues est possible."
 		},
 		{
+			"id": "filament",
+			"title": "Incandescence|du filament",
+			"date": "1801",
+			"description": "L’électricité chauffe le métal qu’elle traverse et le rend incandescence."
+		},
+		{
 			"id": "impression-image",
 			"title": "Impression de l'image|par la lumière",
 			"date": "18ème siècle",
 			"description": "Phénomène naturel grâce auquel l’image est imprimée sur un support grâce à des produits chimiques sensibles à la lumière (photosensible)."
+		},
+		{
+			"id": "microphone",
+			"title": "Microphone",
+			"date": "1877",
+			"description": "Permet de transformer la voix composée d’ondes sonores en signaux électriques et inversement transforme les signaux électrique en son."
+		},
+		{
+			"id": "milieu-vide",
+			"title": "Milieu vidé|de son air",
+			"date": "1840",
+			"description": "L’absence d’oxygène retarde la combustion du filament et donc sa destruction."
+		},
+		{
+			"id": "navette",
+			"title": "Navette portant|le second fil",
+			"date": "1832",
+			"description": "Permet d’introduire un second fil pour former un point noué, plus résistant que le point de chainette."
+		},
+		{
+			"id": "obturateur",
+			"title": "Obturateur",
+			"date": "1895",
+			"description": "Système qui cache l’objectif de l’appareil entre chaque photographie prises. Ainsi lors de la projection, l’impression du mouvement est donnée en intercalant une image noire (objectif obturé) et une photographie."
+		},
+		{
+			"id": "persistence",
+			"title": "Persistence|retinienne",
+			"date": "1829",
+			"description": "L’œil garde en mémoire l’image précédente, ce qui donne au cerveau l’impression de mouvement."
+		},
+		{
+			"id": "projection-image",
+			"title": "Projection|d'une image",
+			"date": "17ème siècle",
+			"description": "Une image fixe, sur un support transparent peut être projetée sur un écran quand la lumière la traverse."
+		},
+		{
+			"id": "quartz",
+			"title": "Principe|du quartz",
+			"date": "1880",
+			"description": "Propriété (la piézo-électricité) qu'ont certains cristaux de vibrer selon une fréquence si on leur applique un courant électrique."
+		},
+		{
+			"id": "rivet",
+			"title": "Rivet",
+			"date": "Age de bronze",
+			"description": "Un rivet est un élément d'assemblage permanent. Il se présente sous la forme d'une tige cylindrique, qui est munie à l'une de ses extrémités d'une 'tête'. L'autre extrémité sera aplatie et élargie "
+		},
+		{
+			"id": "retranscription-son",
+			"title": "Retranscription|du son",
+			"date": "1877",
+			"description": "Les variations de profondeur du sillon sont retranscrite en fréquence et donc en ondes sonores."
 		}
 	],
 
@@ -42,7 +132,7 @@
 		{
 			"id": "velo",
 			"title": "Velo",
-			"items": ["courroie", "equilibre-roues"]
+			"items": ["courroie", "equilibre-roue"]
 		},
 		{
 			"id": "machine-a-coudre",
@@ -52,22 +142,22 @@
 		{
 			"id": "cinema",
 			"title": "Cinéma",
-			"items": ["impression-image", "obturateur", "persistance-retinienne", "pointe-de-chainette", "principe-chambre-obscure", "systeme-entrainemenent-matiere"]
+			"items": ["impression-image", "obturateur", "persistence", "chainette", "chambre-noire"]
 		},
 		{
 			"id": "appareil-photo",
 			"title": "Appareil Photo",
-			"items": ["obturateur", "principe-chambre-obscure"]
+			"items": ["obturateur", "chambre-noire"]
 		},
 		{
 			"id": "telephone",
 			"title": "Téléphone",
-			"items": ["electricite", "incandescence-filament"]
+			"items": ["electricite", "filament"]
 		},
 		{
 			"id": "phonographe",
 			"title": "Phonographe",
-			"items": ["amplificateur", "microphone", "projection-image-ecran"]
+			"items": ["amplificateur", "microphone", "projection-image"]
 		}
 	]
 }

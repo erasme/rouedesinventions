@@ -5,8 +5,8 @@
 	font_name: 'data/kycw1_49.ttf'
 
 <Roue>:
-	circle_radius: min(self.width, self.height) * 0.6
-	item_radius: min(self.width, self.height) * 0.4
+	#circle_radius: min(self.width, self.height) * 0.6
+	#item_radius: min(self.width, self.height) * 0.4
 	circle_outer_radius: self.circle_radius
 
 	canvas.before:
@@ -20,7 +20,7 @@
 		Ellipse:
 			pos: self.center_x - self.circle_outer_radius / 2, self.center_y - self.circle_outer_radius / 2
 			size: self.circle_outer_radius, self.circle_outer_radius
-			segments: 6
+			segments: self.items_count
 			angle_start: self.angle
 			angle_end: self.angle + 360
 
@@ -29,7 +29,7 @@
 		Ellipse:
 			pos: self.center_x - self.circle_radius / 2, self.center_y - self.circle_radius / 2
 			size: self.circle_radius, self.circle_radius
-			segments: 6
+			segments: self.items_count
 			angle_start: self.angle
 			angle_end: self.angle + 360
 
@@ -45,13 +45,12 @@
 		StencilPush
 		Ellipse:
 			size: self.size
-			segments: 40
+			segments: 30
 		StencilUse
 		Color:
 			rgb: 1, 1, 1
-		Ellipse:
+		Rectangle:
 			size: self.size
-			segments: 40
 	canvas.after:
 		StencilPop
 
@@ -144,7 +143,7 @@
 		StencilPop
 
 	Label:
-		text: 'Bravo\nVous avez trouvé\nl\'invention du\n[b]CINEMATOGRAPHE[/b]'
+		text: 'Bravo\nVous avez trouvé\nl\'invention:\n[b]{}[/b]'.format(root.invention_title.upper())
 		markup: True
 		size: root.size
 		halign: 'center'
