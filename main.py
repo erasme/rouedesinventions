@@ -16,15 +16,23 @@ from kivy.properties import NumericProperty, ListProperty, StringProperty, \
 from kivy.vector import Vector
 from kivy.uix.floatlayout import FloatLayout
 from kivy.animation import Animation
+from kivy.uix.image import Image
 from math import cos, sin, pi, degrees
-from itertools import chain
+from os.path import join, dirname
+from glob import glob
+from functools import partial
+from random import random
 
+
+class InventionItem(Scatter):
+    source = StringProperty()
 
 class Invention(FloatLayout):
 
     roue = ObjectProperty()
     radius = NumericProperty(1)
     invention_title = StringProperty()
+    invention_id = StringProperty()
 
     def on_touch_down(self, touch):
         super(Invention, self).on_touch_down(touch)
@@ -33,13 +41,22 @@ class Invention(FloatLayout):
         return True
 
     def show(self):
+        for child in self.children[:]:
+            if isinstance(child, InventionItem):
+                self.remove_widget(child)
         r = max(self.width, self.height) * 1.4
         anim = Animation(radius=r, d=r / 1500., t='out_quad')
         anim.bind(on_complete=self._show_items)
         anim.start(self)
 
     def _show_items(self, *args):
-        pass
+        files = glob(join(dirname(__file__), 'data', 'inventions',
+            self.invention_id, '*.jpg'))
+        d = 0
+        for fn in files:
+            Clock.schedule_once(partial(
+                self._show_item, fn), d)
+            d += .1
 
     def hide(self):
         anim = Animation(radius=1, d=self.radius / 2000., t='in_quad')
@@ -47,8 +64,37 @@ class Invention(FloatLayout):
         anim.start(self)
 
     def _hide_self(self, *args):
+        animc = Animation(opacity=0)
+        for child in self.children:
+            if isinstance(child, InventionItem):
+                animc.start(child)
         self.roue.hide_outer_circle()
         self.parent.remove_widget(self)
+
+    def _show_item(self, fn, *args):
+        image = Image(source=fn)
+        image.size = image.texture_size
+        d_scale = 1. / (max(image.size) / (min(self.size) / 4.))
+
+        item = InventionItem(image=image, size=image.texture_size)
+        item.add_widget(image)
+        item.scale = .01
+        item.opacity = 0.
+        item.rotation = random() * 360
+        item.center = self.center
+
+        hw, hh = [x / 2. for x in self.center]
+        d_rotation = item.rotation + (random() * 20 - 10)
+        d = random() * 360
+        d_x = self.center_x + cos(d) * (hw / 2. + random() * hw)
+        d_y = self.center_y + sin(d) * (hh / 2. + random() * hh)
+
+        anim = Animation(opacity=1., rotation=d_rotation,
+                scale=d_scale,
+                center=(d_x, d_y), t='out_quad')
+        anim.start(item)
+
+        self.add_widget(item)
 
 
 class RoueItem(Scatter):
@@ -174,7 +220,7 @@ class Roue(FloatLayout):
     def update(self, dt):
         if self.found:
             return
-        #self.timer += dt
+        self.timer += dt
         if not self.children:
             return
         self.update_layout(dt)
@@ -283,7 +329,8 @@ class Roue(FloatLayout):
     def show_outer_circle(self, invention_id):
         invention = self.inventions[invention_id]
         self._invention = Invention(roue=self, size=self.size,
-                invention_title=invention.get('title'))
+                invention_title=invention.get('title'),
+                invention_id=invention.get('id'))
         self.add_widget(self._invention)
         self.found = True
         anim = Animation(

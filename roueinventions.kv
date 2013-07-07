@@ -148,3 +148,12 @@
 		size: root.size
 		halign: 'center'
 		font_size: min(self.height, self.width) / 25.
+
+
+<InventionItem>:
+	canvas.before:
+		Color:
+			rgb: .01, .01, .01
+		Rectangle:
+			pos: -5, -5
+			size: self.width + 10, self.height + 10

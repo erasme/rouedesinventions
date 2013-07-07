@@ -135,17 +135,17 @@
 			"items": ["courroie", "equilibre-roue"]
 		},
 		{
-			"id": "machine-a-coudre",
+			"id": "machineacoudre",
 			"title": "Machine à coudre",
 			"items": ["aiguille-chat", "courroie", "navette"]
 		},
 		{
-			"id": "cinema",
+			"id": "camera",
 			"title": "Cinéma",
 			"items": ["impression-image", "obturateur", "persistence", "chainette", "chambre-noire"]
 		},
 		{
-			"id": "appareil-photo",
+			"id": "photo",
 			"title": "Appareil Photo",
 			"items": ["obturateur", "chambre-noire"]
 		},
