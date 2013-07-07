@@ -151,9 +151,11 @@
 
 
 <InventionItem>:
-	canvas.before:
+	size_hint: None, None
+	canvas:
 		Color:
 			rgb: .01, .01, .01
 		Rectangle:
-			pos: -5, -5
-			size: self.width + 10, self.height + 10
+			pos: -dp(5), -dp(5)
+			size: self.width + dp(10), self.height + dp(10)
+
