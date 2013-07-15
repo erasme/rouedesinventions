@@ -89,14 +89,18 @@
 
 	canvas.before:
 		StencilPush
+		#Rectangle:
+		#	size: self.size
+		#	source: 'data/common/circle.png'
 		Ellipse:
 			size: self.size
 			segments: 45
 		StencilUse
 		Color:
-			rgb: 1, 1, 1
+			rgb: 1, 1, 1, .9
 		Rectangle:
 			size: self.size
+			source: 'data/common/circle.png'
 	canvas.after:
 		StencilPop
 

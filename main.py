@@ -113,21 +113,21 @@ class RoueItem(Scatter):
     is_cooking = BooleanProperty(False)
     item_radius = NumericProperty(100)
     first_position = BooleanProperty()
-    description_sh = NumericProperty(0)
+    is_open = BooleanProperty(False)
     roue = ObjectProperty()
     font_size = NumericProperty(10)
     item_scale_open = NumericProperty(1.8)
     desc_opacity = NumericProperty(0)
 
-    _set_rotation = BooleanProperty(False)
+    _set_center = BooleanProperty(False)
+    touch = ObjectProperty(None, allownone=True)
 
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos):
             self.touch = touch
             self.touch_d = touch.x - self.x, touch.y - self.y
-            print self.touch_d
             self.is_manual = True
-            self.show_description()
+            #self.show_description()
         return super(RoueItem, self).on_touch_down(touch)
 
     def on_touch_up(self, touch):
@@ -139,31 +139,45 @@ class RoueItem(Scatter):
                 self.touch = None
         return super(RoueItem, self).on_touch_up(touch)
 
-    def _on_center(self, *args):
-        # refresh rotation
+    def on_center(self, *args):
         if not self.roue:
             return
-        if self._set_rotation:
+        if self._set_center:
             return
-        roue_center = Vector(self.roue.center)
-        center = Vector(self.center)
-        angle = - Vector(0, 1).angle(center - roue_center)
-
-        self._set_rotation = True
-        self.rotation = angle
-        self._set_rotation = False
+        self._set_center = True
+        center = self.touch.pos if self.touch else self.center
+        d = Vector(center).distance(Vector(self.roue.center))
+        if d > self.roue.circle_radius_item / 2 + 50:
+            #self.show_description()
+            self.item_size = self.item_radius * self.item_scale_open
+        elif d < self.roue.circle_radius_item / 2:
+            #self.hide_description()
+            self.item_size = self.item_radius
+        else:
+            delta = (d - self.roue.circle_radius_item / 2) / 50.
+            self.item_size = self.item_radius * (1 + delta *
+                    self.item_scale_open)
+        self._set_center = False
 
     def show_description(self):
+        if self.is_open:
+            return
+        self.is_open = True
         anim = Animation(item_size=self.item_radius * self.item_scale_open,
                 desc_opacity=1., d=.5, t='out_quart')
         anim.bind(on_progress=self.stay_centered)
         anim.start(self)
 
     def stay_centered(self, *args):
+        if not hasattr(self, 'touch'):
+            return
         if self.touch:
             self.pos = self.touch.x - self.touch_d[0], self.touch.y - self.touch_d[1]
 
     def hide_description(self):
+        if not self.is_open:
+            return
+        self.is_open = False
         Animation(item_size=self.item_radius,
                 desc_opacity=0., d=.5, t='out_quart').start(self)
 
@@ -171,6 +185,7 @@ class RoueItem(Scatter):
 class Roue(FloatLayout):
 
     circle_radius = NumericProperty()
+    circle_radius_item = NumericProperty()
     item_radius = NumericProperty(100)
     circle_color = ListProperty([1, 1, 1, 1])
     circle_outer_hidden = BooleanProperty(True)
@@ -200,6 +215,7 @@ class Roue(FloatLayout):
         r = p / self.items_count
         self.item_radius = r * 2 - pi
         self.circle_radius = m - (pi * r - r) - 50
+        self.circle_radius_item = self.circle_radius + self.item_radius
 
 
     def load_inventions(self, data):
