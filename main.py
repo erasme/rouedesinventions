@@ -226,7 +226,7 @@ class Roue(FloatLayout):
     def update(self, dt):
         if self.found:
             return
-        self.timer += dt
+        self.timer += dt * .25
         if not self.children_ordered:
             return
         self.update_layout(dt)
@@ -248,7 +248,7 @@ class Roue(FloatLayout):
             angle = angle_timer + index * angle_step
             cx = self.center_x + cos(angle) * distance
             cy = self.center_y + sin(angle) * distance
-            r = degrees(angle) - 90
+            r = degrees(angle) + 90
 
             if item.first_position:
                 item.center = cx, cy
@@ -256,10 +256,10 @@ class Roue(FloatLayout):
                 item.rotation = r
             else:
                 ix, iy = item.center
-                d = 10 * dt
-                #item.center_x += (cx - ix) * d
-                #item.center_y += (cy - iy) * d
-                item.center = cx, cy
+                d = min(1, dt * 5)
+                item.center_x += (cx - ix) * d
+                item.center_y += (cy - iy) * d
+                #item.center = cx, cy
                 item.rotation = r
 
     def collide_widget(self, other):

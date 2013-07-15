@@ -43,7 +43,7 @@
 		Ellipse:
 			pos: self.center_x - self.circle_outer_radius / 2, self.center_y - self.circle_outer_radius / 2
 			size: self.circle_outer_radius, self.circle_outer_radius
-			segments: self.items_count
+			segments: 90
 			#angle_start: self.angle
 			#angle_end: self.angle + 360
 
@@ -52,7 +52,7 @@
 		Ellipse:
 			pos: self.center_x - self.circle_radius / 2, self.center_y - self.circle_radius / 2
 			size: self.circle_radius, self.circle_radius
-			segments: self.items_count
+			segments: 90
 			#angle_start: self.angle
 			#angle_end: self.angle + 360
 
@@ -92,7 +92,7 @@
 		StencilPush
 		Ellipse:
 			size: self.size
-			segments: 30
+			segments: 45
 		StencilUse
 		Color:
 			rgb: 1, 1, 1
