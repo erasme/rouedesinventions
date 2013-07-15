@@ -123,6 +123,9 @@ class RoueItem(Scatter):
 
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos):
+            self.touch = touch
+            self.touch_d = touch.x - self.x, touch.y - self.y
+            print self.touch_d
             self.is_manual = True
             self.show_description()
         return super(RoueItem, self).on_touch_down(touch)
@@ -133,6 +136,7 @@ class RoueItem(Scatter):
                 self.is_manual = False
                 self.hide_description()
                 self.is_cooking = self.roue.collide_widget(self)
+                self.touch = None
         return super(RoueItem, self).on_touch_up(touch)
 
     def _on_center(self, *args):
@@ -150,8 +154,14 @@ class RoueItem(Scatter):
         self._set_rotation = False
 
     def show_description(self):
-        Animation(item_size=self.item_radius * self.item_scale_open,
-                desc_opacity=1., d=.5, t='out_quart').start(self)
+        anim = Animation(item_size=self.item_radius * self.item_scale_open,
+                desc_opacity=1., d=.5, t='out_quart')
+        anim.bind(on_progress=self.stay_centered)
+        anim.start(self)
+
+    def stay_centered(self, *args):
+        if self.touch:
+            self.pos = self.touch.x - self.touch_d[0], self.touch.y - self.touch_d[1]
 
     def hide_description(self):
         Animation(item_size=self.item_radius,
@@ -310,19 +320,20 @@ class Roue(FloatLayout):
             Animation(gauge_value_animated=max(0, value), d=2.,
                     t='out_elastic').start(self)
 
-        color_hot = [1 - x for x in [0.9411, 0.2274, 0.3137, 1]]
-        color_cold = [1 - x for x in [.28, .75, .92, 1]]
+        #color_hot = [1 - x for x in [0.9411, 0.2274, 0.3137, 1]]
+        color_hot = [1 - x for x in [0.90, 0.0, 0.0]]
+        color_cold = [1 - x for x in [.28, .75, .92]]
 
         if value > 0:
             dest_color = [.91 - x * value for x in color_hot]
         elif value == 0:
-            dest_color = [.91] * 4
+            dest_color = [.91] * 3
         else:
             value = 1
             dest_color = [.91 - x * value for x in color_cold]
 
         d = 3 * dt
-        self.circle_color = [self.circle_color[x] - (self.circle_color[x] - dest_color[x]) * d for x in range(4)]
+        self.circle_color = [self.circle_color[x] - (self.circle_color[x] - dest_color[x]) * d for x in range(3)]
 
         if hot_percent == 1:
             if self.circle_outer_hidden:

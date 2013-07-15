@@ -19,22 +19,10 @@
 			"description": "Une des propriétés de l’électricité est de pouvoir circuler dans des fils conducteurs (cuivre)"
 		},
 		{
-			"id": "chainette",
-			"title": "Point de|chainette",
-			"date": "1830",
-			"description": "Premier point de couture mécanique"
-		},
-		{
 			"id": "chambre-noire",
 			"title": "Principe de la|chambre obscure",
 			"date": "Antiquité",
 			"description": "Phénomène naturel grâce auquel dans une pièce totalement obscure, si la lumière filtre par une petite ouverture, une image inversée apparaît sur le mur opposé à l’ouverture. Cette image est l’exacte copie du paysage extérieur."
-		},
-		{
-			"id": "code-morse",
-			"title": "Code Morse",
-			"date": "1838",
-			"description": "Le code Morse, permet de transcrire des messages. Un signal court forme un point et un signal long forme un trait."
 		},
 		{
 			"id": "courroie",
@@ -43,28 +31,10 @@
 			"description": "C’est une force mécanique qui permet le fonctionnement de l’objet"
 		},
 		{
-			"id": "electroaimant",
-			"title": "Electroaimant",
-			"date": "1820",
-			"description": "Magnétisation du métal par l’électricité : le courant électrique lorsqu’il circule dans un morceau de métal, magnétise ce dernier."
-		},
-		{
-			"id": "engrenage",
-			"title": "Engrenage",
-			"date": "Antiquité",
-			"description": "Ensemble de roues dentées se transmettant un mouvement."
-		},
-		{
 			"id": "equilibre-roue",
 			"title": "Équilibre|sur 2 roues",
 			"date": "1817",
 			"description": "Grâce à la vitesse, l’équilibre sur deux roues est possible."
-		},
-		{
-			"id": "filament",
-			"title": "Incandescence|du filament",
-			"date": "1801",
-			"description": "L’électricité chauffe le métal qu’elle traverse et le rend incandescence."
 		},
 		{
 			"id": "impression-image",
@@ -77,12 +47,6 @@
 			"title": "Microphone",
 			"date": "1877",
 			"description": "Permet de transformer la voix composée d’ondes sonores en signaux électriques et inversement transforme les signaux électrique en son."
-		},
-		{
-			"id": "milieu-vide",
-			"title": "Milieu vidé|de son air",
-			"date": "1840",
-			"description": "L’absence d’oxygène retarde la combustion du filament et donc sa destruction."
 		},
 		{
 			"id": "navette",
@@ -101,24 +65,6 @@
 			"title": "Persistence|retinienne",
 			"date": "1829",
 			"description": "L’œil garde en mémoire l’image précédente, ce qui donne au cerveau l’impression de mouvement."
-		},
-		{
-			"id": "projection-image",
-			"title": "Projection|d'une image",
-			"date": "17ème siècle",
-			"description": "Une image fixe, sur un support transparent peut être projetée sur un écran quand la lumière la traverse."
-		},
-		{
-			"id": "quartz",
-			"title": "Principe|du quartz",
-			"date": "1880",
-			"description": "Propriété (la piézo-électricité) qu'ont certains cristaux de vibrer selon une fréquence si on leur applique un courant électrique."
-		},
-		{
-			"id": "rivet",
-			"title": "Rivet",
-			"date": "Age de bronze",
-			"description": "Un rivet est un élément d'assemblage permanent. Il se présente sous la forme d'une tige cylindrique, qui est munie à l'une de ses extrémités d'une 'tête'. L'autre extrémité sera aplatie et élargie "
 		},
 		{
 			"id": "retranscription-son",
@@ -142,7 +88,7 @@
 		{
 			"id": "camera",
 			"title": "Cinéma",
-			"items": ["impression-image", "obturateur", "persistence", "chainette", "chambre-noire"]
+			"items": ["impression-image", "obturateur", "persistence", "chambre-noire"]
 		},
 		{
 			"id": "photo",
@@ -152,12 +98,12 @@
 		{
 			"id": "telephone",
 			"title": "Téléphone",
-			"items": ["electricite", "filament"]
+			"items": ["electricite", "microphone"]
 		},
 		{
 			"id": "phonographe",
 			"title": "Phonographe",
-			"items": ["amplificateur", "microphone", "projection-image"]
+			"items": ["amplificateur", "microphone", "retranscription-son"]
 		}
 	]
 }
