@@ -257,8 +257,9 @@ class Roue(FloatLayout):
             else:
                 ix, iy = item.center
                 d = 10 * dt
-                item.center_x += (cx - ix) * d
-                item.center_y += (cy - iy) * d
+                #item.center_x += (cx - ix) * d
+                #item.center_y += (cy - iy) * d
+                item.center = cx, cy
                 item.rotation = r
 
     def collide_widget(self, other):
