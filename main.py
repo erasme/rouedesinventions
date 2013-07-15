@@ -314,10 +314,12 @@ class Roue(FloatLayout):
         color_cold = [1 - x for x in [.28, .75, .92, 1]]
 
         if value > 0:
-            dest_color = [1 - x * value for x in color_hot]
+            dest_color = [.91 - x * value for x in color_hot]
+        elif value == 0:
+            dest_color = [.91] * 4
         else:
-            value = -value
-            dest_color = [1 - x * value for x in color_cold]
+            value = 1
+            dest_color = [.91 - x * value for x in color_cold]
 
         d = 3 * dt
         self.circle_color = [self.circle_color[x] - (self.circle_color[x] - dest_color[x]) * d for x in range(4)]
