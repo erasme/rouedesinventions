@@ -4,49 +4,49 @@
 			"id": "aiguille-chat",
 			"title": "Aiguille à chas|dans la pointe",
 			"date": "1755",
-			"description": "Permet de passer le fil au travers du tissu sans que l’aiguille ne traverse complètement. Cette innovation permet de mécaniser la couture en simplifiant le geste au maximum."
+			"description": "Permet de passer le fil au travers du tissu sans|que l’aiguille ne traverse complètement.|Cette innovation permet de mécaniser|la couture en simplifiant le geste|au maximum."
 		},
 		{
 			"id": "amplificateur",
 			"title": "Amplification|du son",
 			"date": "1877",
-			"description": "Les ondes sonores sont augmentées par un cornet acoustique."
+			"description": "Les ondes sonores sont augmentées|par un cornet acoustique."
 		},
 		{
 			"id": "electricite",
 			"title": "Circulation de|l'électricité",
 			"date": "19ème siècle",
-			"description": "Une des propriétés de l’électricité est de pouvoir circuler dans des fils conducteurs (cuivre)"
+			"description": "Une des propriétés de l’électricité est de|pouvoir circuler dans des fils conducteurs|(cuivre)"
 		},
 		{
 			"id": "chambre-noire",
 			"title": "Principe de la|chambre obscure",
 			"date": "Antiquité",
-			"description": "Phénomène naturel grâce auquel dans une pièce totalement obscure, si la lumière filtre par une petite ouverture, une image inversée apparaît sur le mur opposé à l’ouverture. Cette image est l’exacte copie du paysage extérieur."
+			"description": "Phénomène naturel grâce auquel dans une|pièce totalement obscure, si la lumière filtre|par une petite ouverture, une image|inversée apparaît sur le mur|opposé à l’ouverture."
 		},
 		{
 			"id": "courroie",
 			"title": "Courroie entrainée|par une pédale",
 			"date": "1849",
-			"description": "C’est une force mécanique qui permet le fonctionnement de l’objet"
+			"description": "C’est une force mécanique qui permet|le fonctionnement de l’objet"
 		},
 		{
 			"id": "equilibre-roue",
 			"title": "Équilibre|sur 2 roues",
 			"date": "1817",
-			"description": "Grâce à la vitesse, l’équilibre sur deux roues est possible."
+			"description": "Grâce à la vitesse, l’équilibre|sur deux roues est possible."
 		},
 		{
 			"id": "impression-image",
 			"title": "Impression de l'image|par la lumière",
 			"date": "18ème siècle",
-			"description": "Phénomène naturel grâce auquel l’image est imprimée sur un support grâce à des produits chimiques sensibles à la lumière (photosensible)."
+			"description": "Phénomène naturel grâce auquel l’image|est imprimée sur un support grâce|à des produits chimiques|sensibles à la lumière|(photosensible)."
 		},
 		{
 			"id": "microphone",
 			"title": "Microphone",
 			"date": "1877",
-			"description": "Permet de transformer la voix composée d’ondes sonores en signaux électriques et inversement transforme les signaux électrique en son."
+			"description": "Permet de transformer la voix composée|d’ondes sonores en signaux électriques|et inversement transforme|les signaux électrique en son."
 		},
 		{
 			"id": "navette",
@@ -58,19 +58,19 @@
 			"id": "obturateur",
 			"title": "Obturateur",
 			"date": "1895",
-			"description": "Système qui cache l’objectif de l’appareil entre chaque photographie prises. Ainsi lors de la projection, l’impression du mouvement est donnée en intercalant une image noire (objectif obturé) et une photographie."
+			"description": "Système qui cache l’objectif de l’appareil|entre chaque photographie prises. Ainsi|lors de la projection, l’impression|du mouvement est donnée en|intercalant une image noire|et une photographie."
 		},
 		{
 			"id": "persistence",
 			"title": "Persistence|retinienne",
 			"date": "1829",
-			"description": "L’œil garde en mémoire l’image précédente, ce qui donne au cerveau l’impression de mouvement."
+			"description": "L’œil garde en mémoire l’image précédente,|ce qui donne au cerveau l’impression|de mouvement."
 		},
 		{
 			"id": "retranscription-son",
 			"title": "Retranscription|du son",
 			"date": "1877",
-			"description": "Les variations de profondeur du sillon sont retranscrite en fréquence et donc en ondes sonores."
+			"description": "Les variations de profondeur du sillon|sont retranscrite en fréquence|et donc en ondes sonores."
 		}
 	],
 

@@ -119,7 +119,7 @@ class RoueItem(Scatter):
     item_scale_open = NumericProperty(1.8)
     desc_opacity = NumericProperty(0)
 
-    _set_center = BooleanProperty(False)
+    _set_pos = BooleanProperty(False)
     touch = ObjectProperty(None, allownone=True)
 
     def on_touch_down(self, touch):
@@ -127,14 +127,12 @@ class RoueItem(Scatter):
             self.touch = touch
             self.touch_d = touch.x - self.x, touch.y - self.y
             self.is_manual = True
-            #self.show_description()
         return super(RoueItem, self).on_touch_down(touch)
 
     def on_touch_up(self, touch):
         if touch.grab_current == self:
             if len(self._touches) == 1:
                 self.is_manual = False
-                self.hide_description()
                 self.is_cooking = self.roue.collide_widget(self)
                 self.touch = None
         return super(RoueItem, self).on_touch_up(touch)
@@ -142,45 +140,27 @@ class RoueItem(Scatter):
     def on_center(self, *args):
         if not self.roue:
             return
-        if self._set_center:
+        if self._set_pos:
             return
-        self._set_center = True
-        center = self.touch.pos if self.touch else self.center
-        d = Vector(center).distance(Vector(self.roue.center))
-        if d > self.roue.circle_radius_item / 2 + 50:
-            #self.show_description()
+        self._set_pos = True
+        center = self.center
+        pos = self.touch.pos if self.touch else self.center
+        #pos = self.pos
+        d = Vector(pos).distance(Vector(self.roue.center))
+        m = 100
+        if d > self.roue.circle_radius_item / 2 + m:
             self.item_size = self.item_radius * self.item_scale_open
+            self.desc_opacity = 1.
         elif d < self.roue.circle_radius_item / 2:
-            #self.hide_description()
             self.item_size = self.item_radius
+            self.desc_opacity = 0.
         else:
-            delta = (d - self.roue.circle_radius_item / 2) / 50.
-            self.item_size = self.item_radius * (1 + delta *
-                    self.item_scale_open)
-        self._set_center = False
+            delta = (d - self.roue.circle_radius_item / 2) / m
+            self.item_size = self.item_radius * (1 + (delta * (self.item_scale_open - 1)))
+            self.desc_opacity = delta
 
-    def show_description(self):
-        if self.is_open:
-            return
-        self.is_open = True
-        anim = Animation(item_size=self.item_radius * self.item_scale_open,
-                desc_opacity=1., d=.5, t='out_quart')
-        anim.bind(on_progress=self.stay_centered)
-        anim.start(self)
-
-    def stay_centered(self, *args):
-        if not hasattr(self, 'touch'):
-            return
-        if self.touch:
-            self.pos = self.touch.x - self.touch_d[0], self.touch.y - self.touch_d[1]
-
-    def hide_description(self):
-        if not self.is_open:
-            return
-        self.is_open = False
-        Animation(item_size=self.item_radius,
-                desc_opacity=0., d=.5, t='out_quart').start(self)
-
+        self.center = center
+        self._set_pos = False
 
 class Roue(FloatLayout):
 
@@ -268,7 +248,7 @@ class Roue(FloatLayout):
         for index, item in enumerate(self.children_ordered):
             if not isinstance(item, RoueItem):
                 continue
-            if item.is_manual or item.is_cooking:
+            if item.is_manual:
                 continue
 
             item.item_radius = self.item_radius / 2.
@@ -278,16 +258,25 @@ class Roue(FloatLayout):
             r = degrees(angle) + 90
 
             if item.first_position:
-                item.center = cx, cy
+                item.pos = cx, cy
                 item.first_position = False
                 item.rotation = r
             else:
                 ix, iy = item.center
-                d = min(1, dt * 5)
-                item.center_x += (cx - ix) * d
-                item.center_y += (cy - iy) * d
+                d = min(1, dt)
+                v = Vector((cx - ix), (cy - iy))
+                m = 100
+                if v.length() > m:
+                    d /= 4.
+                    v2 = v.normalize() * m * d
+                    item.pos = Vector(item.pos) + v2
+                else:
+                    item.is_cooking = False
+                    item.pos = Vector(item.pos) + v * d
+
                 #item.center = cx, cy
                 item.rotation = r
+
 
     def collide_widget(self, other):
         # distance calculation.

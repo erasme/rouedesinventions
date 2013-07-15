@@ -139,7 +139,10 @@
 			valign: 'middle'
 			halign: 'center'
 			font_size: root.font_size
-			size_hint_y: .45
+			size_hint_y: .40
+
+		Widget:
+			size_hint_y: .05
 
 	GridLayout:
 		cols: 1
@@ -167,7 +170,7 @@
 			height: self.texture_size[1]
 
 		Label:
-			text: root.item_description
+			text: root.item_description.replace('|', '\n')
 			color: (0, .713, .862, 1)
 			font_size: root.font_size
 			text_size: self.width, None
