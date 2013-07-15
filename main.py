@@ -182,6 +182,7 @@ class Roue(FloatLayout):
     angle = NumericProperty()
     gauge_value = NumericProperty()
     gauge_value_animated = NumericProperty()
+    glow_value = NumericProperty()
 
     def __init__(self, **kwargs):
         self.bind(size=self._update_item_radius,
@@ -195,11 +196,10 @@ class Roue(FloatLayout):
         m = min(map(float, self.size))
         p = m * pi
         r = p / self.items_count
-
         p -= r * 4
         r = p / self.items_count
         self.item_radius = r * 2 - pi
-        self.circle_radius = m - r * 3
+        self.circle_radius = m - (pi * r - r) - 50
 
 
     def load_inventions(self, data):
@@ -241,6 +241,7 @@ class Roue(FloatLayout):
             return
         self.update_layout(dt)
         self.check_inventions(dt)
+        self.glow_value = cos(self.timer * 5.)
 
     def update_layout(self, dt):
         count = len(self.children_ordered)
@@ -314,6 +315,11 @@ class Roue(FloatLayout):
         cold_percent = cold / 3.
         value = hot_percent - cold_percent
 
+        if len(count_inventions) > 1 and len(items) != 1:
+            value = -1
+        else:
+            value = hot_percent
+
         # animate the gauge
         if self.gauge_value != value:
             self.gauge_value = max(0, value)
@@ -332,7 +338,7 @@ class Roue(FloatLayout):
             value = 1
             dest_color = [.91 - x * value for x in color_cold]
 
-        d = 3 * dt
+        d = dt
         self.circle_color = [self.circle_color[x] - (self.circle_color[x] - dest_color[x]) * d for x in range(3)]
 
         if hot_percent == 1:

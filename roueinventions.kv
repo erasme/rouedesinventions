@@ -28,8 +28,6 @@
 		source: 'data/sd/thermometre.png'
 
 <Roue>:
-	#circle_radius: min(self.width, self.height) * 0.6
-	#item_radius: min(self.width, self.height) * 0.4
 	circle_outer_radius: self.circle_radius
 
 	canvas.before:
@@ -38,46 +36,47 @@
 		Rectangle:
 			size: self.size
 
-		Color:
-			rgb: 0.9476, 0.6235, 0.6784, 1
-		Ellipse:
-			pos: self.center_x - self.circle_outer_radius / 2, self.center_y - self.circle_outer_radius / 2
-			size: self.circle_outer_radius, self.circle_outer_radius
-			segments: 90
-			#angle_start: self.angle
-			#angle_end: self.angle + 360
+#		Color:
+#			rgb: 0.9476, 0.6235, 0.6784, 1
+#		Ellipse:
+#			pos: self.center_x - self.circle_outer_radius / 2, self.center_y - self.circle_outer_radius / 2
+#			size: self.circle_outer_radius, self.circle_outer_radius
+#			segments: 90
 
 		Color:
 			rgb: self.circle_color
-		Ellipse:
-			pos: self.center_x - self.circle_radius / 2, self.center_y - self.circle_radius / 2
-			size: self.circle_radius, self.circle_radius
-			segments: 90
-			#angle_start: self.angle
-			#angle_end: self.angle + 360
+		Rectangle:
+			pos: self.center_x - self.circle_radius / 2 - root.glow_value * dp(25), self.center_y - self.circle_radius / 2 - root.glow_value * dp(25)
+			size: self.circle_radius + root.glow_value * dp(50), self.circle_radius + root.glow_value * dp(50)
+			source: 'data/sd/back.png'
 
-	Gauge:
-		pos_hint: {'x': -0.020, 'y': 0.020}
-		size_hint: .1, None
-		height: self.width
-		value: root.gauge_value_animated
-		color: root.circle_color
+#		Ellipse:
+#			pos: self.center_x - self.circle_radius / 2, self.center_y - self.circle_radius / 2
+#			size: self.circle_radius, self.circle_radius
+#			segments: 90
 
-
-	Gauge:
-		pos_hint: {'right': 1.020, 'top': 1 - 0.020}
-		size_hint: .1, None
-		height: self.width
-		value: root.gauge_value_animated
-		color: root.circle_color
-		canvas.before:
-			PushMatrix
-			Rotate:
-				axis: 0, 0, 1
-				angle: 180
-				origin: self.center
-		canvas.after:
-			PopMatrix
+#	Gauge:
+#		pos_hint: {'x': -0.020, 'y': 0.020}
+#		size_hint: .1, None
+#		height: self.width
+#		value: root.gauge_value_animated
+#		color: root.circle_color
+#	
+#	
+#	Gauge:
+#		pos_hint: {'right': 1.020, 'top': 1 - 0.020}
+#		size_hint: .1, None
+#		height: self.width
+#		value: root.gauge_value_animated
+#		color: root.circle_color
+#		canvas.before:
+#			PushMatrix
+#			Rotate:
+#				axis: 0, 0, 1
+#				angle: 180
+#				origin: self.center
+#		canvas.after:
+#			PopMatrix
 
 
 
@@ -115,7 +114,7 @@
 
 		Image:
 			source: 'data/sd/{}.png'.format(root.item_id) if root.item_id else None
-			size_hint_y: .6
+			size_hint_y: .55
 
 		Widget:
 			size_hint: .3, None
@@ -136,7 +135,7 @@
 			valign: 'middle'
 			halign: 'center'
 			font_size: root.font_size
-			size_hint_y: .4
+			size_hint_y: .45
 
 	GridLayout:
 		cols: 1
@@ -157,7 +156,7 @@
 					size: self.width / 2., dp(1)
 
 		Label:
-			text: u'Date de creation: {}'.format(root.item_date)
+			text: 'Date de création: {}'.format(root.item_date.encode('utf-8'))
 			color: (.94, .22, .31, 1)
 			font_size: root.font_size
 			size_hint_y: None
@@ -190,7 +189,7 @@
 		StencilPop
 
 	Label:
-		text: 'Bravo\nVous avez trouvé\nl\'invention:\n[b]{}[/b]'.format(root.invention_title.upper())
+		text: 'Bravo\nVous avez trouvé\nl\'invention:\n[b]{}[/b]'.format(root.invention_title.upper().encode('utf-8'))
 		markup: True
 		size: root.size
 		halign: 'center'
