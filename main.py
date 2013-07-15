@@ -5,7 +5,7 @@ Roue des Inventions
 WIP
 '''
 
-__version__ = '0.2'
+__version__ = '0.3'
 
 import json
 from kivy.app import App
@@ -41,6 +41,8 @@ class Invention(FloatLayout):
         return True
 
     def show(self):
+        self._do_hide = False
+        Clock.schedule_once(self.hide, 30)
         for child in self.children[:]:
             if isinstance(child, InventionItem):
                 self.remove_widget(child)
@@ -58,7 +60,10 @@ class Invention(FloatLayout):
                 self._show_item, fn), d)
             d += .1
 
-    def hide(self):
+    def hide(self, *dt):
+        if self._do_hide:
+            return
+        self._do_hide = True
         anim = Animation(radius=1, d=self.radius / 2000., t='in_quad')
         anim.bind(on_complete=self._hide_self)
         anim.start(self)
@@ -149,7 +154,7 @@ class RoueItem(Scatter):
                 desc_opacity=1., d=.5, t='out_quart').start(self)
 
     def hide_description(self):
-        Animation(item_size=self.item_radius, 
+        Animation(item_size=self.item_radius,
                 desc_opacity=0., d=.5, t='out_quart').start(self)
 
 
@@ -165,6 +170,8 @@ class Roue(FloatLayout):
     timer = NumericProperty()
     found = BooleanProperty(False)
     angle = NumericProperty()
+    gauge_value = NumericProperty()
+    gauge_value_animated = NumericProperty()
 
     def __init__(self, **kwargs):
         self.bind(size=self._update_item_radius,
@@ -208,7 +215,6 @@ class Roue(FloatLayout):
                     print 'WARNING: Invention {} missing {}'.format(
                         invention.get('id'), item)
 
-
     def create_item(self, id, title, description, date):
         item = RoueItem(item_id=id, item_title=title,
                 item_date=date, item_description=description,
@@ -221,13 +227,13 @@ class Roue(FloatLayout):
         if self.found:
             return
         self.timer += dt
-        if not self.children:
+        if not self.children_ordered:
             return
         self.update_layout(dt)
         self.check_inventions(dt)
 
     def update_layout(self, dt):
-        count = len(self.children)
+        count = len(self.children_ordered)
         angle_step = (pi * 2) / float(count)
         distance = min(self.width, self.height) * 0.40
         angle_timer = self.timer / 10.
@@ -250,17 +256,10 @@ class Roue(FloatLayout):
                 item.rotation = r
             else:
                 ix, iy = item.center
-                ir = item.rotation
                 d = 10 * dt
                 item.center_x += (cx - ix) * d
                 item.center_y += (cy - iy) * d
-                dr = r - ir
-
-                if dr < -180:
-                    dr += 360
-                elif dr > 180:
-                    dr -= 360
-                item.rotation += dr * d
+                item.rotation = r
 
     def collide_widget(self, other):
         # distance calculation.
@@ -268,7 +267,7 @@ class Roue(FloatLayout):
 
 
     def check_inventions(self, dt):
-        items = [item for item in self.children if item.is_cooking]
+        items = [item for item in self.children_ordered if item.is_cooking]
 
         # search if some item inventions match
         count_inventions = {}
@@ -304,11 +303,16 @@ class Roue(FloatLayout):
         cold_percent = cold / 3.
         value = hot_percent - cold_percent
 
-        #print (hot, cold), (hot_percent, cold_percent), value, count_inventions
+        # animate the gauge
+        if self.gauge_value != value:
+            self.gauge_value = max(0, value)
+            Animation(gauge_value_animated=max(0, value), d=2.,
+                    t='out_elastic').start(self)
+
         color_hot = [1 - x for x in [0.9411, 0.2274, 0.3137, 1]]
         color_cold = [1 - x for x in [.28, .75, .92, 1]]
 
-        if value > 0: 
+        if value > 0:
             dest_color = [1 - x * value for x in color_hot]
         else:
             value = -value
