@@ -17,11 +17,22 @@ from kivy.vector import Vector
 from kivy.uix.floatlayout import FloatLayout
 from kivy.animation import Animation
 from kivy.uix.image import Image
-from math import cos, sin, pi, degrees
+from math import cos, sin, pi, degrees, radians, atan2
 from os.path import join, dirname
 from glob import glob
 from functools import partial
 from random import random
+
+
+def angle_short(a, b):
+    a = radians(a)
+    b = radians(b)
+    result = atan2(sin(b - a), cos(b - a))
+    if result > 0:
+        result = pi - result
+    else:
+        result = -pi - result
+    return degrees(result)
 
 
 class InventionItem(Scatter):
@@ -112,12 +123,15 @@ class RoueItem(Scatter):
     is_manual = BooleanProperty(False)
     is_cooking = BooleanProperty(False)
     item_radius = NumericProperty(100)
-    first_position = BooleanProperty()
+    first_position = NumericProperty()
     is_open = BooleanProperty(False)
     roue = ObjectProperty()
     font_size = NumericProperty(10)
     item_scale_open = NumericProperty(1.8)
     desc_opacity = NumericProperty(0)
+    item_prev_angle = NumericProperty(0)
+    item_angle = NumericProperty(0)
+    wanted_rotation = NumericProperty(0)
 
     _set_pos = BooleanProperty(False)
     touch = ObjectProperty(None, allownone=True)
@@ -135,6 +149,7 @@ class RoueItem(Scatter):
                 self.is_manual = False
                 self.is_cooking = self.roue.collide_widget(self)
                 self.touch = None
+                self.roue.insert_back(self)
         return super(RoueItem, self).on_touch_up(touch)
 
     def on_center(self, *args):
@@ -161,6 +176,20 @@ class RoueItem(Scatter):
 
         self.center = center
         self._set_pos = False
+
+    @property
+    def is_near_wheel(self):
+        return self.distance_to_wheel < self.roue.circle_radius_item / 2. + 200.
+
+    @property
+    def angle_to_wheel(self):
+        v = (Vector(self.center) - Vector(self.roue.center))
+        return radians(v.angle(Vector(1, 0))) % (pi * 2)
+
+    @property
+    def distance_to_wheel(self):
+        return Vector(self.center).distance(Vector(self.roue.center))
+
 
 class Roue(FloatLayout):
 
@@ -239,44 +268,103 @@ class Roue(FloatLayout):
         self.check_inventions(dt)
         self.glow_value = cos(self.timer * 5.)
 
+    def insert_back(self, item):
+        self.children_ordered.remove(item)
+        v = (Vector(item.center) - Vector(self.center))
+        angle = radians(v.angle(Vector(1, 0))) % (pi * 2)
+        for index, child in enumerate(self.children_ordered[:]):
+            if child.item_angle > angle:
+                break
+        self.children_ordered.insert(index, item)
+        item.item_angle = item.item_prev_angle = angle
+
     def update_layout(self, dt):
         count = len(self.children_ordered)
         angle_step = (pi * 2) / float(count)
         distance = min(self.width, self.height) * 0.40
         angle_timer = self.timer / 10.
         self.angle = -degrees(angle_timer)
-        for index, item in enumerate(self.children_ordered):
-            if not isinstance(item, RoueItem):
-                continue
-            if item.is_manual:
-                continue
+        d = min(1, dt)
+
+        children = [x for x in self.children_ordered if isinstance(x, RoueItem)
+                and not x.is_manual and (x.first_position < 2 or
+                    x.is_near_wheel)]
+
+        for index, item in enumerate(children):
 
             item.item_radius = self.item_radius / 2.
-            angle = angle_timer + index * angle_step
-            cx = self.center_x + cos(angle) * distance
-            cy = self.center_y + sin(angle) * distance
-            r = degrees(angle) + 90
 
-            if item.first_position:
-                item.pos = cx, cy
-                item.first_position = False
-                item.rotation = r
+            if item.first_position < 2:
+                angle = angle_timer + index * angle_step
+                cx = self.center_x + cos(angle) * distance
+                cy = self.center_y + sin(angle) * distance
+                item.center = cx, cy
+                item.first_position += 1
+                item.item_angle = item.item_prev_angle = angle
+                continue
+
+            item_prev = children[(index - 1) % len(children)]
+            item_next = children[(index + 1) % len(children)]
+            if index == 0 and False:
+                print item_prev, item_prev.item_angle
+                print item, item.item_angle
+                print item_next, item_next.item_angle
+
+            # get our position on the wheel
+            current_angle = item.item_angle
+            prev_angle = item_prev.item_prev_angle
+            next_angle = item_next.item_prev_angle
+
+            # try to be between both angle
+            if prev_angle > next_angle:
+                prev_angle -= pi * 2
+            dest_angle = (next_angle + prev_angle) / 2.
+
+            #if dest_angle > current_angle:
+            if dest_angle > current_angle:
+                dest_angle -= pi * 2
+            distance_angle = current_angle - dest_angle
+
+            if distance_angle > pi:
+                distance_angle -= pi * 2
+            elif distance_angle < -pi:
+                distance_angle += pi * 2
+
+            item.item_angle -= distance_angle * d * 4
+
+        children = [x for x in self.children_ordered if isinstance(x, RoueItem)
+                and not x.is_manual and x.first_position >= 2]
+        for index, item in enumerate(children):
+
+            cx = self.center_x + cos(item.item_angle) * distance
+            cy = self.center_y + sin(item.item_angle) * distance
+
+            ix, iy = item.center
+            v = Vector((cx - ix), (cy - iy))
+            m = 100
+            if v.length() > m:
+                d /= 4.
+                v2 = v.normalize() * m * d
+                item.pos = Vector(item.pos) + v2
             else:
-                ix, iy = item.center
-                d = min(1, dt)
-                v = Vector((cx - ix), (cy - iy))
-                m = 100
-                if v.length() > m:
-                    d /= 4.
-                    v2 = v.normalize() * m * d
-                    item.pos = Vector(item.pos) + v2
-                else:
-                    item.is_cooking = False
-                    item.pos = Vector(item.pos) + v * d
+                item.is_cooking = False
+                item.pos = Vector(item.pos) + v * d
 
-                #item.center = cx, cy
-                item.rotation = r
+            # adjust the rotation
+            if item.is_near_wheel:
+                rotation = (degrees(item.angle_to_wheel) + 90)
+                item.wanted_rotation += angle_short(rotation, item.wanted_rotation) * d
+                item.rotation = item.wanted_rotation + 180
 
+        for index, item in enumerate(children):
+            item.item_prev_angle = item.item_angle
+
+    def on_size(self, *args):
+        self.force_position()
+
+    def force_position(self):
+        for item in self.children_ordered:
+            item.first_position = 0
 
     def collide_widget(self, other):
         # distance calculation.
