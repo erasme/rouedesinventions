@@ -4,44 +4,12 @@
 <Label>:
 	font_name: 'data/kycw1_49.ttf'
 
-<-Gauge@ProgressBar>:
-	min: 0.0
-	max: 1.0
-	color: (1, 1, 1, 1)
-	Image:
-		pos: root.pos
-		size: root.size
-		source: 'data/sd/jauge.png'
-		color: root.color
-		canvas.before:
-			StencilPush
-			Rectangle:
-				pos: self.pos
-				size: self.width, self.height * root.value
-			StencilUse
-		canvas.after:
-			StencilPop
-
-	Image:
-		pos: root.pos
-		size: root.size
-		source: 'data/sd/thermometre.png'
-
 <Roue>:
-	circle_outer_radius: self.circle_radius
-
 	canvas.before:
 		Color:
 			rgb: 0.81, 0.82, 0.81
 		Rectangle:
 			size: self.size
-
-#		Color:
-#			rgb: 0.9476, 0.6235, 0.6784, 1
-#		Ellipse:
-#			pos: self.center_x - self.circle_outer_radius / 2, self.center_y - self.circle_outer_radius / 2
-#			size: self.circle_outer_radius, self.circle_outer_radius
-#			segments: 90
 
 		Color:
 			rgb: self.circle_color
@@ -49,35 +17,6 @@
 			pos: self.center_x - self.circle_radius / 2 - root.glow_value * dp(25), self.center_y - self.circle_radius / 2 - root.glow_value * dp(25)
 			size: self.circle_radius + root.glow_value * dp(50), self.circle_radius + root.glow_value * dp(50)
 			source: 'data/sd/back.png'
-
-#		Ellipse:
-#			pos: self.center_x - self.circle_radius / 2, self.center_y - self.circle_radius / 2
-#			size: self.circle_radius, self.circle_radius
-#			segments: 90
-
-#	Gauge:
-#		pos_hint: {'x': -0.020, 'y': 0.020}
-#		size_hint: .1, None
-#		height: self.width
-#		value: root.gauge_value_animated
-#		color: root.circle_color
-#	
-#	
-#	Gauge:
-#		pos_hint: {'right': 1.020, 'top': 1 - 0.020}
-#		size_hint: .1, None
-#		height: self.width
-#		value: root.gauge_value_animated
-#		color: root.circle_color
-#		canvas.before:
-#			PushMatrix
-#			Rotate:
-#				axis: 0, 0, 1
-#				angle: 180
-#				origin: self.center
-#		canvas.after:
-#			PopMatrix
-
 
 
 <RoueItem>:
@@ -89,9 +28,6 @@
 
 	canvas.before:
 		StencilPush
-		#Rectangle:
-		#	size: self.size
-		#	source: 'data/common/circle.png'
 		Ellipse:
 			size: self.size
 			segments: 45

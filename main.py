@@ -2,10 +2,13 @@
 Roue des Inventions
 -------------------
 
-WIP
+TODO
+
+- fix 100 - 200 size to ratio of the window size
+- clean the code
 '''
 
-__version__ = '0.3'
+__version__ = '0.4'
 
 import json
 from kivy.app import App
@@ -123,7 +126,6 @@ class RoueItem(Scatter):
     is_manual = BooleanProperty(False)
     is_cooking = BooleanProperty(False)
     item_radius = NumericProperty(100)
-    is_open = BooleanProperty(False)
     roue = ObjectProperty()
     font_size = NumericProperty(10)
     item_scale_open = NumericProperty(1.8)
@@ -138,7 +140,6 @@ class RoueItem(Scatter):
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos):
             self.touch = touch
-            self.touch_d = touch.x - self.x, touch.y - self.y
             self.is_manual = True
         return super(RoueItem, self).on_touch_down(touch)
 
@@ -159,7 +160,6 @@ class RoueItem(Scatter):
         self._set_pos = True
         center = self.center
         pos = self.touch.pos if self.touch else self.center
-        #pos = self.pos
         d = Vector(pos).distance(Vector(self.roue.center))
         m = 100
         if d > self.roue.circle_radius_item / 2 + m:
@@ -201,15 +201,12 @@ class Roue(FloatLayout):
     item_radius = NumericProperty(100)
     circle_color = ListProperty([1, 1, 1, 1])
     circle_outer_hidden = BooleanProperty(True)
-    circle_outer_radius = NumericProperty(10)
     children_ordered = ListProperty([])
     children_outside = ListProperty([])
     items_count = NumericProperty(0)
     timer = NumericProperty()
     found = BooleanProperty(False)
     angle = NumericProperty()
-    gauge_value = NumericProperty()
-    gauge_value_animated = NumericProperty()
     glow_value = NumericProperty()
 
     def __init__(self, **kwargs):
@@ -462,13 +459,6 @@ class Roue(FloatLayout):
         else:
             value = hot_percent
 
-        # animate the gauge
-        if self.gauge_value != value:
-            self.gauge_value = max(0, value)
-            Animation(gauge_value_animated=max(0, value), d=2.,
-                    t='out_elastic').start(self)
-
-        #color_hot = [1 - x for x in [0.9411, 0.2274, 0.3137, 1]]
         color_hot = [1 - x for x in [0.90, 0.0, 0.0]]
         color_cold = [1 - x for x in [.28, .75, .92]]
 
@@ -482,7 +472,6 @@ class Roue(FloatLayout):
 
         d = dt
         self.circle_color = [self.circle_color[x] - (self.circle_color[x] - dest_color[x]) * d for x in range(3)]
-
         if hot_percent == 1:
             if self.circle_outer_hidden:
                 self.show_outer_circle(hot_invention)
@@ -499,28 +488,15 @@ class Roue(FloatLayout):
                 invention_id=invention.get('id'))
         self.add_widget(self._invention)
         self.found = True
-        anim = Animation(
-                circle_outer_radius=(self.circle_radius + self.item_radius),
-                t='out_elastic')
-        #anim += Animation()
-        anim.bind(on_complete=self._show_invention)
-        anim.start(self)
-
-    def hide_outer_circle(self):
-        anim = Animation(circle_outer_radius=self.circle_radius,
-                t='in_elastic')
-        anim.bind(on_complete=self._reset)
-        anim.start(self)
-
-    def _show_invention(self, *args):
         self._invention.show()
 
-    def _reset(self, *args):
+    def hide_outer_circle(self):
         self.found = False
         for child in self.children:
             if isinstance(child, RoueItem):
                 child.is_manual = False
                 child.is_cooking = False
+
 
 class RoueInventionsApp(App):
     icon = 'data/icon.png'
