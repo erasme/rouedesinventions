@@ -21,7 +21,7 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.animation import Animation
 from kivy.uix.image import Image
 from math import cos, sin, pi, degrees, radians, atan2
-from os.path import join, dirname
+from os.path import join, dirname, exists
 from glob import glob
 from functools import partial
 from random import random
@@ -123,6 +123,7 @@ class RoueItem(Scatter):
     item_date = StringProperty()
     item_description = StringProperty()
     item_size = NumericProperty()
+    item_filename = StringProperty()
     is_manual = BooleanProperty(False)
     is_cooking = BooleanProperty(False)
     item_radius = NumericProperty(100)
@@ -136,6 +137,14 @@ class RoueItem(Scatter):
 
     _set_pos = BooleanProperty(False)
     touch = ObjectProperty(None, allownone=True)
+
+    def on_item_id(self, *args):
+        zipfn = 'data/sd/{}.zip'.format(self.item_id)
+        pngfn = 'data/sd/{}.png'.format(self.item_id)
+        if exists(zipfn):
+            self.item_filename = zipfn
+        else:
+            self.item_filename = pngfn
 
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos):

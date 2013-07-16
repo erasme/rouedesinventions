@@ -53,7 +53,9 @@
 				size: self.size
 
 		Image:
-			source: 'data/sd/{}.png'.format(root.item_id) if root.item_id else None
+			id: image
+			anim_delay: 1 / 15.
+			source: root.item_filename
 			size_hint_y: .55
 
 		Widget:
