@@ -277,7 +277,7 @@ class Roue(FloatLayout):
             return
         self.update_layout(dt)
         self.check_inventions(dt)
-        self.glow_value = cos(self.timer * 5.)
+        self.glow_value = cos(self.timer * 3.)
 
     def prepare_back(self, item):
         if item not in self.children_ordered:
