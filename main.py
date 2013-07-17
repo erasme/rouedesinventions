@@ -10,6 +10,9 @@ TODO
 
 __version__ = '0.4'
 
+import sys
+sys.path.insert(0, '/home/biin/rouedesinventions/kivy')
+
 import json
 from kivy.app import App
 from kivy.clock import Clock
