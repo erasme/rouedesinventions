@@ -8,13 +8,14 @@ TODO
 - clean the code
 '''
 
-__version__ = '0.4'
+__version__ = '0.5'
 
+# specific "bad" fix for biin table at erasme.
+# XXX this should not be here, but in a startscript or PYTHONPATH env instead.
 import sys
 sys.path.insert(0, '/home/biin/rouedesinventions/kivy')
 
-import json
-from kivy.app import App
+
 from kivy.clock import Clock
 from kivy.uix.scatter import Scatter
 from kivy.properties import NumericProperty, ListProperty, StringProperty, \
@@ -31,6 +32,8 @@ from random import random
 
 
 def angle_short(a, b):
+    '''Return the shortest angle between 2 number
+    '''
     a = radians(a)
     b = radians(b)
     result = atan2(sin(b - a), cos(b - a))
@@ -42,12 +45,24 @@ def angle_short(a, b):
 
 
 class InventionItem(Scatter):
-    source = StringProperty()
+    '''Represent an invention itself that we can manipulate.
+    '''
+    pass
+
 
 class Invention(FloatLayout):
+    '''Represent an invention, with multiple element on it (images, text, etc.)
+    '''
 
     roue = ObjectProperty()
+    '''Ownership of the invention.
+    '''
+
     radius = NumericProperty(1)
+    '''Radius of the background circle used when entering / leaving the
+    invention browsing part.
+    '''
+
     invention_title = StringProperty()
     invention_id = StringProperty()
 
@@ -98,7 +113,7 @@ class Invention(FloatLayout):
         image.size = image.texture_size
         d_scale = 1. / (max(image.size) / (min(self.size) / 4.))
 
-        item = InventionItem(image=image, size=image.texture_size)
+        item = InventionItem(size=image.texture_size)
         item.add_widget(image)
         item.scale = .01
         item.opacity = 0.
@@ -120,28 +135,69 @@ class Invention(FloatLayout):
 
 
 class RoueItem(Scatter):
+    '''Item on the big wheel that user can manipulate and move within the center
+    of the wheel, or outside the wheel to read the description.
+    '''
 
+    # informations from the json
     item_id = StringProperty()
     item_title = StringProperty()
     item_date = StringProperty()
     item_description = StringProperty()
     item_size = NumericProperty()
     item_filename = StringProperty()
-    is_manual = BooleanProperty(False)
-    is_cooking = BooleanProperty(False)
-    item_radius = NumericProperty(100)
-    roue = ObjectProperty()
-    font_size = NumericProperty(10)
-    item_scale_open = NumericProperty(1.8)
-    desc_opacity = NumericProperty(0)
-    item_prev_angle = NumericProperty(0)
-    item_angle = NumericProperty(0)
-    wanted_rotation = NumericProperty(0)
 
+    is_manual = BooleanProperty(False)
+    '''Indicate if the item is currently manipulated by the user (True) or not
+    (False)
+    '''
+
+    is_cooking = BooleanProperty(False)
+    '''Indicate if the item is currently in the center of the wheel
+    '''
+
+    item_radius = NumericProperty(100)
+    '''Current radius of the item
+    '''
+
+    roue = ObjectProperty()
+    '''Ownership of the item
+    '''
+
+    font_size = NumericProperty(10)
+    '''Font size used for text within the item
+    '''
+
+    item_scale_open = NumericProperty(1.8)
+    '''Factor on how much the item should be resized during its opening. When
+    closing, the factor is back to 1.
+    '''
+
+    desc_opacity = NumericProperty(0)
+    '''Current opacity of the content, used for animating open/close.
+    '''
+
+    item_prev_angle = NumericProperty(0)
+    '''Previous value of item_angle, used for deciding where the item should be
+    inserted again when the user left the item alone.
+    '''
+
+    item_angle = NumericProperty(0)
+    '''Current angle of the item related to the wheel.
+    '''
+
+    wanted_rotation = NumericProperty(0)
+    '''Indicate the ideal rotation in the wheel. This is different from the
+    current rotation, and is used to animate slowly the current rotation to the
+    wanted rotation.
+    '''
+
+    # internals
     _set_pos = BooleanProperty(False)
     touch = ObjectProperty(None, allownone=True)
 
     def on_item_id(self, *args):
+        # load image or animation of the item.
         zipfn = 'data/sd/{}.zip'.format(self.item_id)
         pngfn = 'data/sd/{}.png'.format(self.item_id)
         if exists(zipfn):
@@ -150,12 +206,14 @@ class RoueItem(Scatter):
             self.item_filename = pngfn
 
     def on_touch_down(self, touch):
+        # check if the item is currently manipulated by the user or not
         if self.collide_point(*touch.pos):
             self.touch = touch
             self.is_manual = True
         return super(RoueItem, self).on_touch_down(touch)
 
     def on_touch_up(self, touch):
+        # don't forget to check when the user stop manipulating the item.
         if touch.grab_current == self:
             if len(self._touches) == 1:
                 self.is_manual = False
@@ -165,6 +223,7 @@ class RoueItem(Scatter):
         return super(RoueItem, self).on_touch_up(touch)
 
     def on_center(self, *args):
+        # every time the item is moving, do some checks.
         if not self.roue:
             return
         if self._set_pos:
@@ -190,23 +249,31 @@ class RoueItem(Scatter):
 
     @property
     def is_near_wheel(self):
+        # return True is the item is near the wheel (used for deciding if the
+        # item should be inserted back in the wheel or not)
         return self.distance_to_wheel < self.roue.circle_radius_item / 2. + 200.
 
     @property
     def angle_to_wheel(self):
+        # relative angle of the item to the wheel
         v = (Vector(self.center) - Vector(self.roue.center))
         return radians(v.angle(Vector(1, 0))) % (pi * 2)
 
     @property
     def distance_to_wheel(self):
+        # relative distance between the item and the wheel
         return Vector(self.center).distance(Vector(self.roue.center))
 
     @property
     def is_outside_center(self):
+        # return True if the item is not currently in the center of the wheel
+        # (used for deciding if it should be used for cooking or not)
         return self.distance_to_wheel > self.roue.circle_radius_item / 2. - 200
 
 
 class Roue(FloatLayout):
+    '''Representation of the wheel, containing all the item.
+    '''
 
     circle_radius = NumericProperty()
     circle_radius_item = NumericProperty()
@@ -510,13 +577,21 @@ class Roue(FloatLayout):
                 child.is_cooking = False
 
 
-class RoueInventionsApp(App):
-    icon = 'data/icon.png'
-    def build(self):
-        with open('data/inventions.json') as fd:
-            inventions = json.load(fd)
-        roue = Roue()
-        roue.load_inventions(inventions)
-        return roue
+if __name__ == '__main__':
 
-RoueInventionsApp().run()
+    from kivy.app import App
+    import json
+
+    class RoueInventionsApp(App):
+
+        icon = 'data/icon.png'
+
+        def build(self):
+            with open('data/inventions.json') as fd:
+                inventions = json.load(fd)
+            roue = Roue()
+            roue.load_inventions(inventions)
+            return roue
+
+    RoueInventionsApp().run()
+
