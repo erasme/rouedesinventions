@@ -31,11 +31,12 @@ from functools import partial
 from random import random
 
 
-def angle_short(a, b):
+def angle_short(a, b, rad=False):
     '''Return the shortest angle between 2 number
     '''
-    a = radians(a)
-    b = radians(b)
+    if not rad:
+        a = radians(a)
+        b = radians(b)
     result = atan2(sin(b - a), cos(b - a))
     if result > 0:
         result = pi - result
@@ -357,7 +358,10 @@ class Roue(FloatLayout):
 
     def insert_back(self, item):
         # insert an item within the wheel, at the right place.
-        self.children_outside.remove(item)
+        if item in self.children_ordered:
+            self.children_ordered.remove(item)
+        else:
+            self.children_outside.remove(item)
         v = (Vector(item.center) - Vector(self.center))
         angle = radians(v.angle(Vector(1, 0))) % (pi * 2)
 
@@ -369,6 +373,12 @@ class Roue(FloatLayout):
             if child.item_angle % (pi * 2) > angle:
                 break
 
+        if index == len(self.children_ordered) - 1:
+            # select the shortest angle
+            a = angle_short(self.children_ordered[0].item_angle, angle, rad=True)
+            b = angle_short(self.children_ordered[-1].item_angle, angle, rad=True)
+            if a < b:
+                index = 0
         self.children_ordered.insert(index, item)
         item.item_angle = item.item_prev_angle = angle
 
@@ -380,7 +390,7 @@ class Roue(FloatLayout):
         self.angle = -degrees(angle_timer)
         d = min(1, dt)
 
-        # the during few iteration, we need to force size / position and
+        # during few iteration, we need to force size / position and
         # rotation. This is for handling window resizing.
         if self.force_position < 2:
             for index, item in enumerate(self.children_ordered):
@@ -399,6 +409,15 @@ class Roue(FloatLayout):
             self.force_position += 1
             return
 
+
+        # nicer insertion if the item is manipulated by the user
+        for item in self.children_outside + self.children_ordered:
+            if not item.is_manual:
+                continue
+            if item.is_near_wheel:
+                self.insert_back(item)
+            else:
+                self.prepare_back(item)
 
         # all the widgets going on outside the wheel is moving back slowly to
         # the wheel
@@ -429,7 +448,7 @@ class Roue(FloatLayout):
 
         # that's the most important part: position the item equally between
         # previous and next children
-        children = [x for x in self.children_ordered if not x.is_manual]
+        children = self.children_ordered[:]
         for index, item in enumerate(children):
 
             item.item_radius = self.item_radius / 2.
@@ -459,6 +478,7 @@ class Roue(FloatLayout):
             item.item_angle -= distance_angle * d * 4
 
         # then, move them slowly to the position we wanted
+        children = [x for x in self.children_ordered if not x.is_manual]
         for index, item in enumerate(children):
             item.item_angle += d * 0.03
             item.item_angle %= pi * 2
