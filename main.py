@@ -601,13 +601,15 @@ if __name__ == '__main__':
 
     from kivy.app import App
     import json
+    import os
 
     class RoueInventionsApp(App):
 
         icon = 'data/icon.png'
 
         def build(self):
-            with open('data/inventions.json') as fd:
+            directory = os.path.dirname(__file__)
+            with open(directory+'/data/inventions.json') as fd:
                 inventions = json.load(fd)
             roue = Roue()
             roue.load_inventions(inventions)
